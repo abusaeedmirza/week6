@@ -83,6 +83,12 @@ const chartData = async () => {
     height: 450,
     colors: ["#eb5146"]
   });
+  document.getElementById("add-data").addEventListener("click", function () {
+    const newpoint = pre_fun(label_array, popuplation);
+    let label = newpoint[0];
+    let valueFromEachDataset = [newpoint[1]];
+    chart.addDataPoint(label, valueFromEachDataset);
+  });
 };
 chartData();
 
@@ -131,7 +137,7 @@ document.getElementById("submit-data").onclick = async function (event) {
     municipalitypopdata.dimension.Vuosi.category.label
   );
   const municipalitypop = municipalitypopdata.value;
-  console.log(municipalitypop);
+  //console.log(municipalitypop);
 
   const newchart = {
     labels: years,
@@ -144,27 +150,33 @@ document.getElementById("submit-data").onclick = async function (event) {
     height: 450,
     colors: ["#eb5146"]
   });
-  //console.log(municipalitypop[municipalitypop.length - 1]);
+
+  document.getElementById("add-data").addEventListener("click", function () {
+    const newpoint = pre_fun(years, municipalitypop);
+    let label = newpoint[0];
+    let valueFromEachDataset = [newpoint[1]];
+    chart.addDataPoint(label, valueFromEachDataset);
+  });
+};
+const pre_fun = (years, municipalitypop) => {
+  console.log(years);
+  console.log(municipalitypop);
   const predict_array = [];
   const size = municipalitypop.length;
-  //console.log("size " + size);
+  console.log(municipalitypop[21]);
   for (let i = size - 4; i < size - 1; i++) {
     const sum = parseInt(municipalitypop[i + 1]) - parseInt(municipalitypop[i]);
-    console.log("sum is " + sum);
+    console.log("( " + (i + 1) + ", " + i + ")");
     predict_array.push(sum);
   }
   console.log(predict_array);
-  const mean =
+  var mean =
     (predict_array[0] + predict_array[1] + predict_array[2]) / 3 +
     municipalitypop[municipalitypop.length - 1];
-  //console.log("mean " + mean);
-  document.getElementById("add-data").addEventListener("click", function () {
-    console.log("mean " + mean);
-    const newlabel = String(parseInt(years[years.length - 1]) + 1);
-    //years.push(newlabel);
-    //console.log(years);
-    let label = newlabel;
-    let valueFromEachDataset = [mean];
-    chart.addDataPoint(label, valueFromEachDataset);
-  });
+  mean = mean.toFixed(0);
+  console.log("mean " + mean);
+  const newlabel = String(parseInt(years[years.length - 1]) + 1);
+
+  return [newlabel, mean];
+  //  });
 };
