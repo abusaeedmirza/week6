@@ -264,9 +264,9 @@ var fetchnewpopulation = /*#__PURE__*/function () {
       while (1) switch (_context4.prev = _context4.next) {
         case 0:
           JSONQuery.query[1].selection.values[0] = String(areacode);
-          console.log(JSONQuery);
+          //console.log(JSONQuery);
           url = "https://statfin.stat.fi/PxWeb/api/v1/en/StatFin/synt/statfin_synt_pxt_12dy.px";
-          _context4.next = 5;
+          _context4.next = 4;
           return fetch(url, {
             method: "POST",
             headers: {
@@ -274,15 +274,14 @@ var fetchnewpopulation = /*#__PURE__*/function () {
             },
             body: JSON.stringify(JSONQuery)
           });
-        case 5:
+        case 4:
           res = _context4.sent;
-          _context4.next = 8;
+          _context4.next = 7;
           return res.json();
-        case 8:
+        case 7:
           data = _context4.sent;
-          console.log(data);
           return _context4.abrupt("return", data);
-        case 11:
+        case 9:
         case "end":
           return _context4.stop();
       }
@@ -294,7 +293,7 @@ var fetchnewpopulation = /*#__PURE__*/function () {
 }();
 document.getElementById("submit-data").onclick = /*#__PURE__*/function () {
   var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(event) {
-    var municipalitycodes, codes, names, input_code, correcttext, indexofarea, indexis, correctcode, municipalitypopdata, years, municipalitypop, newchart, chart;
+    var municipalitycodes, codes, names, input_code, correcttext, indexofarea, indexis, correctcode, municipalitypopdata, years, municipalitypop, newchart, chart, predict_array, size, i, sum, mean;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
         case 0:
@@ -304,20 +303,17 @@ document.getElementById("submit-data").onclick = /*#__PURE__*/function () {
         case 3:
           municipalitycodes = _context5.sent;
           codes = municipalitycodes.variables[1].values;
-          names = municipalitycodes.variables[1].valueTexts;
-          console.log(names);
+          names = municipalitycodes.variables[1].valueTexts; //console.log(names);
           input_code = document.getElementById("input-area").value;
           correcttext = input_code.charAt(0).toUpperCase() + input_code.slice(1).toLowerCase();
-          console.log(correcttext);
           indexofarea = function indexofarea(element) {
             return element == correcttext;
           };
           indexis = names.findIndex(indexofarea);
           correctcode = codes[indexis];
-          console.log("corrrect code is " + correctcode);
-          _context5.next = 16;
+          _context5.next = 13;
           return fetchnewpopulation(correctcode);
-        case 16:
+        case 13:
           municipalitypopdata = _context5.sent;
           years = Object.values(municipalitypopdata.dimension.Vuosi.category.label);
           municipalitypop = municipalitypopdata.value;
@@ -336,8 +332,26 @@ document.getElementById("submit-data").onclick = /*#__PURE__*/function () {
             type: "line",
             height: 450,
             colors: ["#eb5146"]
+          }); //console.log(municipalitypop[municipalitypop.length - 1]);
+          predict_array = [];
+          size = municipalitypop.length; //console.log("size " + size);
+          for (i = size - 4; i < size - 1; i++) {
+            sum = parseInt(municipalitypop[i + 1]) - parseInt(municipalitypop[i]);
+            console.log("sum is " + sum);
+            predict_array.push(sum);
+          }
+          console.log(predict_array);
+          mean = (predict_array[0] + predict_array[1] + predict_array[2]) / 3 + municipalitypop[municipalitypop.length - 1]; //console.log("mean " + mean);
+          document.getElementById("add-data").addEventListener("click", function () {
+            console.log("mean " + mean);
+            var newlabel = String(parseInt(years[years.length - 1]) + 1);
+            //years.push(newlabel);
+            //console.log(years);
+            var label = newlabel;
+            var valueFromEachDataset = [mean];
+            chart.addDataPoint(label, valueFromEachDataset);
           });
-        case 22:
+        case 25:
         case "end":
           return _context5.stop();
       }
