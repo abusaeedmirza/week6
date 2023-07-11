@@ -28,28 +28,28 @@ const JSONQuery = {
           "2018",
           "2019",
           "2020",
-          "2021"
-        ]
-      }
+          "2021",
+        ],
+      },
     },
     {
       code: "Alue",
       selection: {
         filter: "item",
-        values: ["SSS"]
-      }
+        values: ["SSS"],
+      },
     },
     {
       code: "Tiedot",
       selection: {
         filter: "item",
-        values: ["vaesto"]
-      }
-    }
+        values: ["vaesto"],
+      },
+    },
   ],
   response: {
-    format: "json-stat2"
-  }
+    format: "json-stat2",
+  },
 };
 
 const getData = async () => {
@@ -58,7 +58,7 @@ const getData = async () => {
   const res = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(JSONQuery)
+    body: JSON.stringify(JSONQuery),
   });
   const data = await res.json();
   return data;
@@ -73,7 +73,7 @@ const chartData = async () => {
   //console.log(label_array);
   const chartdata = {
     labels: label_array,
-    datasets: [{ name: "Data", type: "line", values: popuplation }]
+    datasets: [{ name: "Data", type: "line", values: popuplation }],
   };
 
   const chart = new Chart("#chart", {
@@ -81,7 +81,7 @@ const chartData = async () => {
     data: chartdata,
     type: "line",
     height: 450,
-    colors: ["#eb5146"]
+    colors: ["#eb5146"],
   });
 };
 chartData();
@@ -91,7 +91,7 @@ const municipalitydata = async () => {
     "https://statfin.stat.fi/PxWeb/api/v1/en/StatFin/synt/statfin_synt_pxt_12dy.px";
   const res = await fetch(url, {
     method: "GET",
-    headers: { "content-type": "application/json" }
+    headers: { "content-type": "application/json" },
   });
   const data = await res.json();
   //console.log(data.variables[1].values);
@@ -105,52 +105,46 @@ const fetchnewpopulation = async (areacode) => {
   const res = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(JSONQuery)
+    body: JSON.stringify(JSONQuery),
   });
   const data = await res.json();
   console.log(data);
   return data;
 };
-//municipalitydata();
+
 document.getElementById("submit-data").onclick = async function (event) {
   event.preventDefault();
   const municipalitycodes = await municipalitydata();
   const codes = municipalitycodes.variables[1].values;
-  //console.log(codes);
-  //const editarray = JSONQuery.query[1].selection.values;
+  const names = municipalitycodes.variables[1].valueTexts;
+  console.log(names);
 
-  //for (let i = 1; i < codes.length; i++) {
-  //  editarray.push(codes[i]);
-  //}
-  //console.log(JSONQuery);
   const input_code = document.getElementById("input-area").value;
-  const correctcode =
-    input_code.substring(0, 2).toUpperCase() + input_code.substring(2);
-  console.log(correctcode);
+  const correcttext =
+    input_code.charAt(0).toUpperCase() + input_code.slice(1).toLowerCase();
+
+  console.log(correcttext);
+  const indexofarea = (element) => element == correcttext;
+
+  const indexis = names.findIndex(indexofarea);
+  const correctcode = codes[indexis];
+  console.log("corrrect code is " + correctcode);
   const municipalitypopdata = await fetchnewpopulation(correctcode);
   const years = Object.values(
     municipalitypopdata.dimension.Vuosi.category.label
   );
   const municipalitypop = municipalitypopdata.value;
   console.log(municipalitypop);
-  //console.log(Object.values(municipalitypopdata));
+
   const newchart = {
     labels: years,
-    datasets: [{ name: "Data", type: "line", values: municipalitypop }]
+    datasets: [{ name: "Data", type: "line", values: municipalitypop }],
   };
   const chart = new Chart("#chart", {
     title: "Chart",
     data: newchart,
     type: "line",
     height: 450,
-    colors: ["#eb5146"]
+    colors: ["#eb5146"],
   });
 };
-//myfunction();
-//const inputdata = document.getElementById("submit-data");
-//const input_code = document.getElementById("input-area").value;
-
-//inputdata.addEventListener("click", function () {
-//  const input_code = document.getElementById("input-area").value;
-//  console.log(input_code);
-//});
