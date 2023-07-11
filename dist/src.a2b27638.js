@@ -215,7 +215,13 @@ var chartData = /*#__PURE__*/function () {
             height: 450,
             colors: ["#eb5146"]
           });
-        case 7:
+          document.getElementById("add-data").addEventListener("click", function () {
+            var newpoint = pre_fun(label_array, popuplation);
+            var label = newpoint[0];
+            var valueFromEachDataset = [newpoint[1]];
+            chart.addDataPoint(label, valueFromEachDataset);
+          });
+        case 8:
         case "end":
           return _context2.stop();
       }
@@ -293,7 +299,7 @@ var fetchnewpopulation = /*#__PURE__*/function () {
 }();
 document.getElementById("submit-data").onclick = /*#__PURE__*/function () {
   var _ref5 = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime().mark(function _callee5(event) {
-    var municipalitycodes, codes, names, input_code, correcttext, indexofarea, indexis, correctcode, municipalitypopdata, years, municipalitypop, newchart, chart, predict_array, size, i, sum, mean;
+    var municipalitycodes, codes, names, input_code, correcttext, indexofarea, indexis, correctcode, municipalitypopdata, years, municipalitypop, newchart, chart;
     return _regeneratorRuntime().wrap(function _callee5$(_context5) {
       while (1) switch (_context5.prev = _context5.next) {
         case 0:
@@ -316,8 +322,7 @@ document.getElementById("submit-data").onclick = /*#__PURE__*/function () {
         case 13:
           municipalitypopdata = _context5.sent;
           years = Object.values(municipalitypopdata.dimension.Vuosi.category.label);
-          municipalitypop = municipalitypopdata.value;
-          console.log(municipalitypop);
+          municipalitypop = municipalitypopdata.value; //console.log(municipalitypop);
           newchart = {
             labels: years,
             datasets: [{
@@ -332,26 +337,14 @@ document.getElementById("submit-data").onclick = /*#__PURE__*/function () {
             type: "line",
             height: 450,
             colors: ["#eb5146"]
-          }); //console.log(municipalitypop[municipalitypop.length - 1]);
-          predict_array = [];
-          size = municipalitypop.length; //console.log("size " + size);
-          for (i = size - 4; i < size - 1; i++) {
-            sum = parseInt(municipalitypop[i + 1]) - parseInt(municipalitypop[i]);
-            console.log("sum is " + sum);
-            predict_array.push(sum);
-          }
-          console.log(predict_array);
-          mean = (predict_array[0] + predict_array[1] + predict_array[2]) / 3 + municipalitypop[municipalitypop.length - 1]; //console.log("mean " + mean);
+          });
           document.getElementById("add-data").addEventListener("click", function () {
-            console.log("mean " + mean);
-            var newlabel = String(parseInt(years[years.length - 1]) + 1);
-            //years.push(newlabel);
-            //console.log(years);
-            var label = newlabel;
-            var valueFromEachDataset = [mean];
+            var newpoint = pre_fun(years, municipalitypop);
+            var label = newpoint[0];
+            var valueFromEachDataset = [newpoint[1]];
             chart.addDataPoint(label, valueFromEachDataset);
           });
-        case 25:
+        case 19:
         case "end":
           return _context5.stop();
       }
@@ -361,6 +354,25 @@ document.getElementById("submit-data").onclick = /*#__PURE__*/function () {
     return _ref5.apply(this, arguments);
   };
 }();
+var pre_fun = function pre_fun(years, municipalitypop) {
+  console.log(years);
+  console.log(municipalitypop);
+  var predict_array = [];
+  var size = municipalitypop.length;
+  console.log(municipalitypop[21]);
+  for (var i = size - 4; i < size - 1; i++) {
+    var sum = parseInt(municipalitypop[i + 1]) - parseInt(municipalitypop[i]);
+    console.log("( " + (i + 1) + ", " + i + ")");
+    predict_array.push(sum);
+  }
+  console.log(predict_array);
+  var mean = (predict_array[0] + predict_array[1] + predict_array[2]) / 3 + municipalitypop[municipalitypop.length - 1];
+  mean = mean.toFixed(0);
+  console.log("mean " + mean);
+  var newlabel = String(parseInt(years[years.length - 1]) + 1);
+  return [newlabel, mean];
+  //  });
+};
 },{"frappe-charts":"node_modules/frappe-charts/dist/frappe-charts.min.umd.js"}],"node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
