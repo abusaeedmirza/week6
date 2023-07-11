@@ -28,28 +28,28 @@ const JSONQuery = {
           "2018",
           "2019",
           "2020",
-          "2021",
-        ],
-      },
+          "2021"
+        ]
+      }
     },
     {
       code: "Alue",
       selection: {
         filter: "item",
-        values: ["SSS"],
-      },
+        values: ["SSS"]
+      }
     },
     {
       code: "Tiedot",
       selection: {
         filter: "item",
-        values: ["vaesto"],
-      },
-    },
+        values: ["vaesto"]
+      }
+    }
   ],
   response: {
-    format: "json-stat2",
-  },
+    format: "json-stat2"
+  }
 };
 
 const getData = async () => {
@@ -58,7 +58,7 @@ const getData = async () => {
   const res = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(JSONQuery),
+    body: JSON.stringify(JSONQuery)
   });
   const data = await res.json();
   return data;
@@ -73,7 +73,7 @@ const chartData = async () => {
   //console.log(label_array);
   const chartdata = {
     labels: label_array,
-    datasets: [{ name: "Data", type: "line", values: popuplation }],
+    datasets: [{ name: "Data", type: "line", values: popuplation }]
   };
 
   const chart = new Chart("#chart", {
@@ -81,7 +81,7 @@ const chartData = async () => {
     data: chartdata,
     type: "line",
     height: 450,
-    colors: ["#eb5146"],
+    colors: ["#eb5146"]
   });
 };
 chartData();
@@ -91,7 +91,7 @@ const municipalitydata = async () => {
     "https://statfin.stat.fi/PxWeb/api/v1/en/StatFin/synt/statfin_synt_pxt_12dy.px";
   const res = await fetch(url, {
     method: "GET",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json" }
   });
   const data = await res.json();
   //console.log(data.variables[1].values);
@@ -99,16 +99,16 @@ const municipalitydata = async () => {
 };
 const fetchnewpopulation = async (areacode) => {
   JSONQuery.query[1].selection.values[0] = String(areacode);
-  console.log(JSONQuery);
+  //console.log(JSONQuery);
   const url =
     "https://statfin.stat.fi/PxWeb/api/v1/en/StatFin/synt/statfin_synt_pxt_12dy.px";
   const res = await fetch(url, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify(JSONQuery),
+    body: JSON.stringify(JSONQuery)
   });
   const data = await res.json();
-  console.log(data);
+  //console.log(data);
   return data;
 };
 
@@ -117,18 +117,15 @@ document.getElementById("submit-data").onclick = async function (event) {
   const municipalitycodes = await municipalitydata();
   const codes = municipalitycodes.variables[1].values;
   const names = municipalitycodes.variables[1].valueTexts;
-  console.log(names);
+  //console.log(names);
 
   const input_code = document.getElementById("input-area").value;
   const correcttext =
     input_code.charAt(0).toUpperCase() + input_code.slice(1).toLowerCase();
-
-  console.log(correcttext);
   const indexofarea = (element) => element == correcttext;
-
   const indexis = names.findIndex(indexofarea);
   const correctcode = codes[indexis];
-  console.log("corrrect code is " + correctcode);
+
   const municipalitypopdata = await fetchnewpopulation(correctcode);
   const years = Object.values(
     municipalitypopdata.dimension.Vuosi.category.label
@@ -138,13 +135,36 @@ document.getElementById("submit-data").onclick = async function (event) {
 
   const newchart = {
     labels: years,
-    datasets: [{ name: "Data", type: "line", values: municipalitypop }],
+    datasets: [{ name: "Data", type: "line", values: municipalitypop }]
   };
   const chart = new Chart("#chart", {
     title: "Chart",
     data: newchart,
     type: "line",
     height: 450,
-    colors: ["#eb5146"],
+    colors: ["#eb5146"]
+  });
+  //console.log(municipalitypop[municipalitypop.length - 1]);
+  const predict_array = [];
+  const size = municipalitypop.length;
+  //console.log("size " + size);
+  for (let i = size - 4; i < size - 1; i++) {
+    const sum = parseInt(municipalitypop[i + 1]) - parseInt(municipalitypop[i]);
+    console.log("sum is " + sum);
+    predict_array.push(sum);
+  }
+  console.log(predict_array);
+  const mean =
+    (predict_array[0] + predict_array[1] + predict_array[2]) / 3 +
+    municipalitypop[municipalitypop.length - 1];
+  //console.log("mean " + mean);
+  document.getElementById("add-data").addEventListener("click", function () {
+    console.log("mean " + mean);
+    const newlabel = String(parseInt(years[years.length - 1]) + 1);
+    //years.push(newlabel);
+    //console.log(years);
+    let label = newlabel;
+    let valueFromEachDataset = [mean];
+    chart.addDataPoint(label, valueFromEachDataset);
   });
 };
