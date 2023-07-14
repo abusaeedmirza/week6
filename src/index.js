@@ -1,5 +1,5 @@
 import { Chart } from "frappe-charts";
-
+const exportdata = {};
 const JSONQuery = {
   query: [
     {
@@ -69,7 +69,7 @@ const chartData = async () => {
   //console.log(Object.keys(data.dimension.Vuosi.category.label));
   const label_array = Object.values(data.dimension.Vuosi.category.label);
   const popuplation = data.value;
-  //console.log(data.value);
+  //console.log(data);
   //console.log(label_array);
   const chartdata = {
     labels: label_array,
@@ -120,6 +120,11 @@ const fetchnewpopulation = async (areacode) => {
 
 document.getElementById("submit-data").onclick = async function (event) {
   event.preventDefault();
+  const codeis = await areachart();
+  const exportdata = { publicVariable: codeis };
+};
+const areachart = async () => {
+  //event.preventDefault();
   const municipalitycodes = await municipalitydata();
   const codes = municipalitycodes.variables[1].values;
   const names = municipalitycodes.variables[1].valueTexts;
@@ -128,7 +133,7 @@ document.getElementById("submit-data").onclick = async function (event) {
   const input_code = document.getElementById("input-area").value;
   const correcttext =
     input_code.charAt(0).toUpperCase() + input_code.slice(1).toLowerCase();
-  const indexofarea = (element) => element == correcttext;
+  const indexofarea = (element) => element === correcttext;
   const indexis = names.findIndex(indexofarea);
   const correctcode = codes[indexis];
 
@@ -157,6 +162,7 @@ document.getElementById("submit-data").onclick = async function (event) {
     let valueFromEachDataset = [newpoint[1]];
     chart.addDataPoint(label, valueFromEachDataset);
   });
+  return correctcode;
 };
 const pre_fun = (years, municipalitypop) => {
   console.log(years);
@@ -180,3 +186,5 @@ const pre_fun = (years, municipalitypop) => {
   return [newlabel, mean];
   //  });
 };
+console.log("code is " + Object.values(exportdata));
+//export { exportdata };
